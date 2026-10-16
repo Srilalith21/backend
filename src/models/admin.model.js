@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import validator from "validator";
+import jwt from "jsonwebtoken";
+import config from "../config/config.js";
 
 const adminSchema = new mongoose.Schema(
   {
@@ -45,13 +47,18 @@ const adminSchema = new mongoose.Schema(
     adminMobile: {
       type: String,
     },
-    election: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "elections",
-    },
   },
   { timestamps: true },
 );
+
+adminSchema.methods.generateAuthToken = async function () {
+  const admin = this;
+
+  const token = jwt.sign({ _id: admin._id.toString() }, config.SECRET_KEY, {
+    expiresIn: "1h",
+  });
+  return token;
+};
 
 const Admin = mongoose.model("admin", adminSchema);
 

@@ -3,10 +3,63 @@ import Admin from "../models/admin.model.js";
 import Election from "../models/election.model.js";
 import Candidate from "../models/candidate.model.js";
 import User from "../models/user.model.js";
-
+import {
+  validateCandidateRegistrationFields,
+  validateElectionCreationFields,
+} from "../middlewares/admin.middleware.js";
+import {
+  postCreateElection,
+  postCreateCandidate,
+} from "../controllers/admin.controller.js";
 import { authenticateAdmin } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
+
+router.post("/register", async (req, res) => {
+  try {
+    const admin = await Admin.create(req.body);
+
+    if (!admin) {
+      throw new Error("Admin registration failed");
+    }
+
+    res.status(201).json({ status: "success" });
+  } catch (error) {
+    res.status(400).json({ status: "failed", message: error.message });
+  }
+});
+
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const admin = await Admin.findOne({ adminEmail: email });
+
+    if (!admin) {
+      throw new Error("Invalid Credentials");
+    }
+
+    const isValidPassword = admin.adminPassword == password;
+
+    if (!isValidPassword) {
+      throw new Error("Invalid Credentials");
+    }
+
+    const adminToken = await admin.generateAuthToken();
+
+    res.cookie("adminToken", adminToken, { maxAge: 3600000 });
+    res
+      .status(200)
+      .json({ status: "success", message: "Admin login successful" });
+  } catch (error) {
+    res.status(400).json({ status: "failed", message: error.message });
+  }
+});
+
+router.get("/logout", (req, res) => {
+  res.clearCookie();
+  res.send("Logout success");
+});
 
 router.get("/dashboard", authenticateAdmin, async (req, res) => {
   /**
@@ -37,21 +90,27 @@ router.get("/dashboard", authenticateAdmin, async (req, res) => {
   }
 });
 
-router.get("/create-election", authenticateAdmin, (req, res) => {
-  // Logic for creating an election
+router.post(
+  "/create-election",
+  authenticateAdmin,
+  validateElectionCreationFields,
+  postCreateElection,
+);
 
-  res.json({ message: "create election" });
-});
+router.post(
+  "/create-candidate",
+  authenticateAdmin,
+  validateCandidateRegistrationFields,
+  postCreateCandidate,
+);
 
 /**
  * ROUTES TO BE CREATED
  *
- * /create-election
- * /insert-candidate
+ * /create-election  ----FONE
+ * /create-candidate ----DONE
  * /view-election by ID
  * /view-candidate by ID
- * /view-election-results by ID
- * /view-election-results-by-candidate
  * /view-votes-per-candidate
  * /view-votes-per-election
  */

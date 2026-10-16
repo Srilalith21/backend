@@ -16,12 +16,14 @@ const electionSchema = new mongoose.Schema(
     electionCandidates: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: "candidates",
+      default: [],
     },
-    electionStartDate: { type: Date, required: true },
-    electionResultsDate: { type: Date, required: true },
+    electionStartDate: { type: String, required: true },
+    electionResultsDate: { type: String, required: true },
     electionWinner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "candidates",
+      default: null,
     },
   },
   { timestamps: true },

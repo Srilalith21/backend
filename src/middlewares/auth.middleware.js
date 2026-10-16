@@ -57,13 +57,13 @@ export async function authenticateUser(req, res, next) {
 
 export async function authenticateAdmin(req, res, next) {
   try {
-    const token = req.cookies?.token;
+    const token = req.cookies.adminToken;
+
     if (!token) {
       return res
         .status(401)
         .json({ status: "Failed", message: "Unauthorized" });
     }
-
     next();
   } catch (error) {
     res.status(403).json({ status: "Failed", message: error.message });

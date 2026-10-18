@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 
 import config from "../config/config.js";
 import User from "../models/user.model.js";
+import Admin from "../models/admin.model.js";
 
 export async function validateLoginFields(req, res, next) {
   try {
@@ -64,6 +65,17 @@ export async function authenticateAdmin(req, res, next) {
         .status(401)
         .json({ status: "Failed", message: "Unauthorized" });
     }
+
+    const decodedCookie = jwt.verify(token, config.SECRET_KEY);
+    if (!decodedCookie || !decodedCookie._id) {
+      throw new Error("Invalid token");
+    }
+
+    const fetchAdminData = await Admin.findById(decodedCookie._id);
+    if (!fetchAdminData) {
+      throw new Error("Admin not found");
+    }
+    req.admin = fetchAdminData;
     next();
   } catch (error) {
     res.status(403).json({ status: "Failed", message: error.message });

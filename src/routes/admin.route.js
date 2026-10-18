@@ -1,8 +1,10 @@
 import express from "express";
+import mongoose from "mongoose";
 import Admin from "../models/admin.model.js";
 import Election from "../models/election.model.js";
 import Candidate from "../models/candidate.model.js";
 import User from "../models/user.model.js";
+import { authenticateAdmin } from "../middlewares/auth.middleware.js";
 import {
   validateCandidateRegistrationFields,
   validateElectionCreationFields,
@@ -10,8 +12,12 @@ import {
 import {
   postCreateElection,
   postCreateCandidate,
+  getElectionByName,
+  getCandidateByName,
+  getTotalVotes,
+  deleteElectionByName,
+  updateElectionStatus,
 } from "../controllers/admin.controller.js";
-import { authenticateAdmin } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -38,8 +44,12 @@ router.post("/login", async (req, res) => {
     if (!admin) {
       throw new Error("Invalid Credentials");
     }
-
+    const isValidEmail = admin.adminEmail == email;
     const isValidPassword = admin.adminPassword == password;
+
+    if (!isValidEmail) {
+      throw new Error("Invalid Credentials");
+    }
 
     if (!isValidPassword) {
       throw new Error("Invalid Credentials");
@@ -57,8 +67,8 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/logout", (req, res) => {
-  res.clearCookie();
-  res.send("Logout success");
+  res.cookie("adminToken", "", { maxAge: 0 });
+  res.json({ status: "success", message: "Admin logged out successfully" });
 });
 
 router.get("/dashboard", authenticateAdmin, async (req, res) => {
@@ -104,15 +114,33 @@ router.post(
   postCreateCandidate,
 );
 
+router.get("/view-election/:name", authenticateAdmin, getElectionByName);
+
+router.get("/view-candidate/:name", authenticateAdmin, getCandidateByName);
+
+router.get("/view-total-votes", authenticateAdmin, getTotalVotes);
+
+router.delete(
+  "/delete-election/:name",
+  authenticateAdmin,
+  deleteElectionByName,
+);
+
+router.patch(
+  "/update-election-status",
+  authenticateAdmin,
+  updateElectionStatus,
+);
+
 /**
  * ROUTES TO BE CREATED
  *
- * /create-election  ----FONE
+ * /create-election  ----DONE
  * /create-candidate ----DONE
- * /view-election by ID
- * /view-candidate by ID
- * /view-votes-per-candidate
- * /view-votes-per-election
+ * /view-election by Name ----DONE
+ * /view-candidate by Name ----DONE
+ * /view-total-votes ----DONE
+ * /update-election-status ----DONE
  */
 
 export default router;

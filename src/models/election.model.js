@@ -25,6 +25,11 @@ const electionSchema = new mongoose.Schema(
       ref: "candidates",
       default: null,
     },
+    electionStatus: {
+      type: String,
+      enum: ["upcoming", "ongoing", "completed"],
+      default: "upcoming",
+    },
   },
   { timestamps: true },
 );

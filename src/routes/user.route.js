@@ -1,47 +1,12 @@
-/**
- * /dashboard
- * /view-results
- * /edit/me
- * /profile
- */
 import express from "express";
 
 import { authenticateUser } from "../middlewares/auth.middleware.js";
 import checkVoteStatus from "../middlewares/vote.middleware.js";
 ("../middlewares/vote.middleware.js");
-import User from "../models/user.model.js";
+import { getUserDashboard } from "../controllers/user.controller.js";
+import Election from "../models/election.model.js";
 
 const router = express.Router();
-
-router.get("/user-dashboard", authenticateUser, (req, res) => {
-  try {
-    /**
-     * Requirements
-     * 1. User Votes count
-     * 2. User Profile Such as (name,age,mobile,email)
-     * 3. User Role
-     * 4. User Voter ID
-     * 5. User Election Status
-     */
-
-    // Later Add the data Total Candidates, Total Parties (ADD THIS IN DIFFERENT ROUTE)
-    const userData = {
-      userName: req.user.userName,
-      age: req.user.age,
-      email: req.user.email,
-      mobile: req.user.mobile,
-      voterId: req.user.voterId,
-      role: req.user.role,
-      voteStatus: req.user.voteStatus,
-    };
-
-    res
-      .status(200)
-      .json({ status: "success", message: "User dashboard", data: userData });
-  } catch (error) {
-    res.status(400).json({ status: "failed", message: error.message });
-  }
-});
 
 router.post(
   "/vote/:candidateId",
@@ -82,10 +47,23 @@ router.post(
 
 router.get("/view-results", authenticateUser, async (req, res) => {
   try {
-    // TODO : Implement the logic to fetch and retund the election results from the database
+    const electionResults = await Election.find({
+      $nor: [{ electionWinner: null }],
+    });
+    // TODO 
+    if (!electionResults) {
+      throw new Error("No election results found");
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: electionResults ? electionResults : [],
+    });
   } catch (error) {
     res.status(400).json({ status: "failed", message: error.message });
   }
 });
+
+router.get("/dashboard", authenticateUser, getUserDashboard);
 
 export default router;

@@ -1,7 +1,5 @@
-import mongoose from "mongoose";
 import Candidate from "../models/candidate.model.js";
 import User from "../models/user.model.js";
-import Admin from "../models/admin.model.js";
 import Election from "../models/election.model.js";
 
 export async function postCreateCandidate(req, res) {
@@ -162,11 +160,6 @@ export async function updateElectionStatus(req, res) {
   }
 }
 
-/**
- * TASK
- * 1. Total number of elections -DONE
- * 2. CRUD operations for Candidates
- */
 
 export async function getTotalElections(req, res) {
   try {

@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import validator from "validator";
 
 const electionSchema = new mongoose.Schema(
   {
@@ -30,6 +29,7 @@ const electionSchema = new mongoose.Schema(
       enum: ["upcoming", "ongoing", "completed"],
       default: "upcoming",
     },
+    currentStatus: { type: "boolean", default: false },
   },
   { timestamps: true },
 );

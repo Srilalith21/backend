@@ -20,14 +20,17 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get("/", (req, res) => {
-  console.log(req)
-  res.json({ message: "Welcome to the Online Voting System API" });
-});
-
 app.use("/auth", authRoute);
 app.use("/user", userRoute);
 app.use("/api/admin", adminRoute);
+
+app.use((req, res) => {
+  res.status(404).json({
+    status: "failed",
+    message: "Route not found",
+    requestedUrl: req.originalUrl,
+  });
+});
 
 connectDB()
   .then(() => {

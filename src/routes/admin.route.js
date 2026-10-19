@@ -1,5 +1,4 @@
 import express from "express";
-import mongoose from "mongoose";
 import Admin from "../models/admin.model.js";
 import Election from "../models/election.model.js";
 import Candidate from "../models/candidate.model.js";
@@ -131,16 +130,5 @@ router.patch(
   authenticateAdmin,
   updateElectionStatus,
 );
-
-/**
- * ROUTES TO BE CREATED
- *
- * /create-election  ----DONE
- * /create-candidate ----DONE
- * /view-election by Name ----DONE
- * /view-candidate by Name ----DONE
- * /view-total-votes ----DONE
- * /update-election-status ----DONE
- */
 
 export default router;

@@ -4,7 +4,7 @@ export async function getUserDashboard(req, res) {
   try {
     /**Dashboard */
 
-    const userData = res.user;
+    const userData = req.USER;
 
     const electionData = await Election.findOne({
       currentStatus: true,
@@ -17,7 +17,8 @@ export async function getUserDashboard(req, res) {
     res.status(200).json({
       status: "success",
       message: "User dashboard",
-      data: electionData ? electionData : "No active election found",
+      userData: userData ? userData : "No user data found",
+      electionData: electionData ? electionData : "No active election found",
     });
   } catch (error) {
     res.status(400).json({

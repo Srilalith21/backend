@@ -5,6 +5,8 @@ import config from "../config/config.js";
 import User from "../models/user.model.js";
 import Admin from "../models/admin.model.js";
 
+const SELECTED_FIELDS = "userName email mobile voteStatus age voterId";
+
 export async function validateLoginFields(req, res, next) {
   try {
     const data = req.body;
@@ -43,12 +45,14 @@ export async function authenticateUser(req, res, next) {
       throw new Error("Invalid token");
     }
 
-    const loggedInUserData = await User.findById(decodedCookie.id);
+    const loggedInUserData = await User.findById(decodedCookie.id).select(
+      SELECTED_FIELDS,
+    );
     if (!loggedInUserData) {
       throw new Error("User not found");
     }
 
-    req.user = loggedInUserData;
+    req.USER = loggedInUserData;
 
     next();
   } catch (error) {

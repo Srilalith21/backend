@@ -50,7 +50,7 @@ router.get("/view-results", authenticateUser, async (req, res) => {
     const electionResults = await Election.find({
       $nor: [{ electionWinner: null }],
     });
-    // TODO 
+    // TODO
     if (!electionResults) {
       throw new Error("No election results found");
     }
@@ -58,6 +58,18 @@ router.get("/view-results", authenticateUser, async (req, res) => {
     res.status(200).json({
       status: "success",
       data: electionResults ? electionResults : [],
+    });
+  } catch (error) {
+    res.status(400).json({ status: "failed", message: error.message });
+  }
+});
+
+router.get("username", authenticateUser, async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+    res.status(200).json({
+      status: "success",
+      data: loggedInUser.username,
     });
   } catch (error) {
     res.status(400).json({ status: "failed", message: error.message });

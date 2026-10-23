@@ -64,7 +64,7 @@ router.get("/view-results", authenticateUser, async (req, res) => {
   }
 });
 
-router.get("username", authenticateUser, async (req, res) => {
+router.get("/username", authenticateUser, async (req, res) => {
   try {
     const loggedInUser = req.user;
     res.status(200).json({

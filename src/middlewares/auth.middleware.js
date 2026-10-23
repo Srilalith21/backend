@@ -6,6 +6,7 @@ import User from "../models/user.model.js";
 import Admin from "../models/admin.model.js";
 
 const SELECTED_FIELDS = "userName email mobile voteStatus age voterId";
+const LOGIN_SELECTED_FIELDS = `${SELECTED_FIELDS} password`;
 
 export async function validateLoginFields(req, res, next) {
   try {
@@ -20,11 +21,14 @@ export async function validateLoginFields(req, res, next) {
       throw new Error("Password is required");
     }
 
-    const loggedInUser = await User.findOne({ email: data.email });
+    const loggedInUser = await User.findOne({ email: data.email }).select(
+      LOGIN_SELECTED_FIELDS,
+    );
     if (!loggedInUser) {
       throw new Error("Invalid Credentials");
     }
     req.user = loggedInUser;
+
     next();
   } catch (error) {
     res.status(400).json({ status: "Failed", message: error.message });

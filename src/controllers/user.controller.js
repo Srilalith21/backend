@@ -5,6 +5,7 @@ export async function getUserDashboard(req, res) {
     /**Dashboard */
 
     const userData = req.USER;
+    console.log("User Data:", userData);
 
     const electionData = await Election.findOne({
       currentStatus: true,

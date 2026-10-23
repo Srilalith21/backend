@@ -34,10 +34,7 @@ router.post("/register", async (req, res) => {
 router.post("/login", validateLoginFields, async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) {
-      throw new Error("Invalid Credentials");
-    }
+    const user = req.user;
 
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
@@ -45,9 +42,27 @@ router.post("/login", validateLoginFields, async (req, res) => {
     }
     const token = generateJWTToken(user._id);
 
-    res.cookie("token", token, { maxAge: 3600000 }); // 1 hour
+    const data = {
+      userId: user._id,
+      userName: user.userName,
+      email: user.email,
+      mobile: user.mobile,
+      voteStatus: user.voteStatus,
+      age: user.age,
+      voterId: user.voterId,
+      role: user.role,
+    };
 
-    res.status(200).json({ status: "success", message: "Login successful" });
+    res.cookie("token", token, {
+      maxAge: 3600000,
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+    }); // 1 hour
+
+    res
+      .status(200)
+      .json({ status: "success", message: "Login successful", userData: data });
   } catch (error) {
     res.status(400).json({ status: "failed", message: error.message });
   }

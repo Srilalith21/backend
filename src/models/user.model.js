@@ -46,8 +46,9 @@ userSchema.methods.hashPassword = async function (password) {
   return hashedPassword;
 };
 
-userSchema.methods.comparePassword = async function (password) {
-  const isMatch = await bcrypt.compare(password, this.password);
+userSchema.methods.comparePassword = async function (pass) {
+  const user = this;
+  const isMatch = await bcrypt.compare(pass, user.password);
   if (!isMatch) {
     throw new Error("Invalid Credentials");
   }

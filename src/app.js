@@ -6,9 +6,19 @@ import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
 import adminRoute from "./routes/admin.route.js";
 import config from "./config/config.js";
+import cors from "cors";
+import morgan from "morgan";
 
 const app = express();
 
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+); // Enable CORS for all routes
+
+app.use(morgan("dev")); // Logging middleware
 app.use(express.json()); // Middleware to parse JSON request bodies
 app.use(cookieParser()); // Middleware to parse cookies
 

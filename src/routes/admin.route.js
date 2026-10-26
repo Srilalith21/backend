@@ -11,6 +11,7 @@ import {
 import {
   postCreateElection,
   postCreateCandidate,
+  getAllElections,
   getElectionByName,
   getCandidateByName,
   getTotalVotes,
@@ -112,6 +113,8 @@ router.post(
   validateCandidateRegistrationFields,
   postCreateCandidate,
 );
+
+router.get("/elections", authenticateAdmin, getAllElections);
 
 router.get("/view-election/:name", authenticateAdmin, getElectionByName);
 

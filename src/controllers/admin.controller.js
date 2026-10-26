@@ -74,6 +74,16 @@ export async function postCreateElection(req, res) {
   }
 }
 
+export async function getAllElections(req, res) {
+  try {
+    const elections = await Election.find().sort({ createdAt: -1 });
+
+    res.status(200).json({ status: "success", data: elections });
+  } catch (error) {
+    res.status(500).json({ status: "failed", message: error.message });
+  }
+}
+
 export async function getElectionByName(req, res) {
   try {
     const electionName = req.params.name;

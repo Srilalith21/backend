@@ -1,8 +1,10 @@
 export default function checkVoteStatus(req, res, next) {
   try {
-    const user = req.user;
-
-    if (user.voteStatus) {
+    const user = req.USER;
+    if (!user) {
+      throw new Error("User not found");
+    }
+    if (user.voteStatus.status) {
       throw new Error("Cannot vote again. You have already voted.");
     }
     next();

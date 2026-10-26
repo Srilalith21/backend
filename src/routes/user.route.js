@@ -1,49 +1,44 @@
 import express from "express";
-
+import mongoose from "mongoose";
 import { authenticateUser } from "../middlewares/auth.middleware.js";
 import checkVoteStatus from "../middlewares/vote.middleware.js";
 ("../middlewares/vote.middleware.js");
 import { getUserDashboard } from "../controllers/user.controller.js";
 import Election from "../models/election.model.js";
+import Candidate from "../models/candidate.model.js";
 
 const router = express.Router();
 
-router.post(
-  "/vote/:candidateId",
-  authenticateUser,
-  checkVoteStatus,
-  async (req, res) => {
-    try {
-      /**
-       * TODO: Implement the voting logic here
-       * fetch the candidateID from the DB and then add the vote to the candidate and update the user
-       */
-
-      // CUSTOM DATA
-      const candidateDetails = {
-        candidateId: 11212,
-        candidateName: "Elon Musk",
-        partyName: "Democratic Party",
-        voteCount: 10,
-        candidaeGender: "Male",
-        candidateUrl:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-rNtvrUnGruyUXyNqWz-jC3f1fpo78wvb0j9AfzTEAnbOtvlMekqLJQEU-e8yky_Ytq3EL6zjJrEKaSlkBU_vEV46FL6NPNO4gqAbUdg&s=10",
-      };
-      candidateDetails.voteCount += 1;
-      const loggedInUser = req.user;
-      loggedInUser.voteStatus = true;
-
-      const updatedUser = await loggedInUser.save();
-      console.log("Updated User:", updatedUser);
-      res.status(200).json({
-        status: "success",
-        message: "Vote casted successfully",
-      });
-    } catch (error) {
-      res.status(400).json({ status: "failed", message: error.message });
+router.get("/vote/:id", authenticateUser, checkVoteStatus, async (req, res) => {
+  try {
+    const candidateId = req.params?.id;
+    if (!mongoose.Types.ObjectId.isValid(candidateId)) {
+      throw new Error("Invalid candidate ID");
     }
-  },
-);
+    const candidateData = await Candidate.findById({ _id: candidateId });
+
+    if (!candidateData) {
+      throw new Error("Candidate not found to Vote");
+    }
+    console.log(candidateData);
+    candidateData.votes += 1;
+    console.log("After ", candidateData);
+    const candidateVote = await candidateData.save();
+
+    console.log("Saved candidate vote: ", candidateVote);
+    const user = req.USER;
+    user.voteStatus.status = true;
+    const userSave = await user.save();
+    console.log(userSave);
+
+    res.status(200).json({
+      status: "success",
+      message: "Vote casted successfully",
+    });
+  } catch (error) {
+    res.status(400).json({ status: "failed", message: error.message });
+  }
+});
 
 router.get("/view-results", authenticateUser, async (req, res) => {
   try {

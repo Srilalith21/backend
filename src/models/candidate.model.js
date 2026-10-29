@@ -25,7 +25,6 @@ const candidateSchema = new mongoose.Schema(
     },
     candidateImageUrl: {
       type: String,
-      required: true,
       validate: (value) => {
         const url = validator.isURL(value);
         if (!url) {
